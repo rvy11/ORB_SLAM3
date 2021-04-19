@@ -75,7 +75,7 @@ int main(int argc, char **argv)
   bool bEqual = false;
   if(argc < 3 || argc > 4)
   {
-    cerr << endl << "Usage: rosrun ORB_SLAM3 Mono_Inertial path_to_vocabulary path_to_settings [do_equalize]" << endl;
+    cerr << endl << "Usage: rosrun ORB_SLAM3 Mono_Inertial path_to_vocabulary path_to_settings [do_equalize] " << endl;
     ros::shutdown();
     return 1;
   }
@@ -95,8 +95,8 @@ int main(int argc, char **argv)
   ImageGrabber igb(&SLAM,&imugb,bEqual); // TODO
   
   // Maximum delay, 5 seconds
-  ros::Subscriber sub_imu = n.subscribe("/imu", 1000, &ImuGrabber::GrabImu, &imugb); 
-  ros::Subscriber sub_img0 = n.subscribe("/camera/image_raw", 100, &ImageGrabber::GrabImage,&igb);
+  ros::Subscriber sub_imu = n.subscribe("/imu/imu", 1000, &ImuGrabber::GrabImu, &imugb); 
+  ros::Subscriber sub_img0 = n.subscribe("/camera_array/cam0/image_raw", 100, &ImageGrabber::GrabImage,&igb);
 
   std::thread sync_thread(&ImageGrabber::SyncWithImu,&igb);
 

@@ -51,9 +51,9 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "RGBD");
     ros::start();
 
-    if(argc != 4)
+    if(argc != 5)
     {
-        cerr << endl << "Usage: rosrun ORB_SLAM3 Stereo path_to_vocabulary path_to_settings do_rectify" << endl;
+        cerr << endl << "Usage: rosrun ORB_SLAM3 Stereo path_to_vocabulary path_to_settings do_rectify output_name" << endl;
         ros::shutdown();
         return 1;
     }    
@@ -107,8 +107,10 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/camera/left/image_raw", 1);
-    message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/camera/right/image_raw", 1);
+    // message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/zedm/zed_node/left/image_rect_color", 1);
+    message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/camera_array/cam1/image_raw", 1);
+    // message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/zedm/zed_node/right/image_rect_color", 1);
+    message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/camera_array/cam2/image_raw", 1);
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> sync_pol;
     message_filters::Synchronizer<sync_pol> sync(sync_pol(10), left_sub,right_sub);
     sync.registerCallback(boost::bind(&ImageGrabber::GrabStereo,&igb,_1,_2));
@@ -119,9 +121,10 @@ int main(int argc, char **argv)
     SLAM.Shutdown();
 
     // Save camera trajectory
-    SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory_TUM_Format.txt");
-    SLAM.SaveTrajectoryTUM("FrameTrajectory_TUM_Format.txt");
-    SLAM.SaveTrajectoryKITTI("FrameTrajectory_KITTI_Format.txt");
+    const string kf_file =  "kf_" + string(argv[argc-1]) + ".txt";
+    const string f_file =  "f_" + string(argv[argc-1]) + ".txt";
+    SLAM.SaveTrajectoryTUM(f_file);
+    SLAM.SaveKeyFrameTrajectoryTUM(kf_file);
 
     ros::shutdown();
 

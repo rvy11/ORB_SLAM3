@@ -36,7 +36,7 @@
 namespace ORB_SLAM3
 {
 
-Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
+Verbose::eLevel Verbose::th = Verbose::VERBOSITY_DEBUG;
 
 System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
                const bool bUseViewer, const int initFr, const string &strSequence, const string &strLoadingFile):
@@ -215,7 +215,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpLoopCloser->SetLocalMapper(mpLocalMapper);
 
     // Fix verbosity
-    Verbose::SetTh(Verbose::VERBOSITY_QUIET);
+    Verbose::SetTh(Verbose::VERBOSITY_DEBUG);
 
 }
 

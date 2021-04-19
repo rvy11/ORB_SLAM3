@@ -47,3 +47,9 @@ cmake-build-debug/
 
 *.pyc
 *.osa
+
+.idea
+.vscode
+
+*.txt
+*.yaml

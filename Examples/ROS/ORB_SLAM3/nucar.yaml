@@ -1,0 +1,181 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters. Adjust them!
+#--------------------------------------------------------------------------------------------
+Camera.type: "PinHole"
+
+# Camera calibration and distortion parameters (OpenCV) 
+Camera.fx: 1855.14056
+Camera.fy: 1855.17506
+Camera.cx: 576.490465
+Camera.cy: 461.186707
+
+#[1855.14056, 0.0, 576.490465, 0.0, 1855.17506, 461.186707, 0.0, 0.0, 1.0]
+#[-0.453517035,  1.53813696,  0.00322026698,  0.00103383271,  -6.43034518]
+Camera.k1: -0.453517035
+Camera.k2: 1.53813696
+Camera.p1: 0.00322026698
+Camera.p2: 0.00103383271
+Camera.k3: -6.43034518
+# Camera.k1: 0.0
+# Camera.k2: 0.0
+# Camera.p1: 0.0
+# Camera.p2: 0.0
+
+Camera.bFishEye: 0
+
+Camera.width: 1224
+Camera.height: 1024
+
+# Camera frames per second 
+# Camera.fps: 5
+Camera.fps: 8.66
+
+# stereo baseline times fx
+Camera.bf: 612.1963848
+
+# Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
+Camera.RGB: 1
+
+# Close/Far threshold. Baseline times.
+ThDepth: 40.0
+
+#--------------------------------------------------------------------------------------------
+# Stereo Rectification. Only if you need to pre-rectify the images.
+# Camera.fx, .fy, etc must be the same as in LEFT.P
+#--------------------------------------------------------------------------------------------
+# Cam0:
+#  [[1.87303777e+03 0.00000000e+00 5.91382613e+02]
+#   [0.00000000e+00 1.87198704e+03 4.57359970e+02]
+#   [0.00000000e+00 0.00000000e+00 1.00000000e+00]] 
+#  [[-0.45406808  0.71412158  0.00685386  0.0049637  -1.12241632]]
+
+# Cam2: 
+#  [[1.84807476e+03 0.00000000e+00 5.90529970e+02]
+#   [0.00000000e+00 1.84862591e+03 4.79328489e+02]
+#   [0.00000000e+00 0.00000000e+00 1.00000000e+00]] 
+#  [[-3.26122341e-01 -5.97094776e-01  2.51398230e-03 -8.29770945e-04   4.73314324e+00]]
+RIGHT.height: 1024
+RIGHT.width: 1224
+RIGHT.D: !!opencv-matrix
+   rows: 1
+   cols: 5
+   dt: d
+   # data:[-0.06001035588294054, 0.3466585291091072, 0.0, 0.0]
+   data: [-0.326122341, -0.597094776,  0.00251398230, -0.000829770945,  4.73314324]
+RIGHT.K: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [1848.07476, 0.0, 590.529970, 0.0, 1848.62591, 479.328489, 0.0, 0.0, 1.0]
+RIGHT.R:  !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+RIGHT.P:  !!opencv-matrix
+   rows: 3
+   cols: 4
+   dt: d
+   data: [1848.07476, 0.0, 590.529970, 0.0, 0.0, 1848.62591, 479.328489, 0.0, 0.0, 0.0, 1.0, 0.0]
+
+# Cam1:
+# K = [[1855.6883567     0.          592.58784489]
+#  [   0.         1859.523529    436.62441441]
+#  [   0.            0.            1.        ]]
+# dist = [[-0.42333509  1.3208055  -0.00029786 -0.00003269 -6.25814839]]
+
+# Cam1:
+#  [[1.85514056e+03 0.00000000e+00 5.76490465e+02]
+#   [0.00000000e+00 1.85517506e+03 4.61186707e+02]
+#   [0.00000000e+00 0.00000000e+00 1.00000000e+00]] 
+
+#  [[-4.53517035e-01  1.53813696e+00  3.22026698e-03  1.03383271e-03  -6.43034518e+00]]
+
+LEFT.height: 1024
+LEFT.width: 1224
+LEFT.D: !!opencv-matrix
+   rows: 1
+   cols: 5
+   dt: d
+   # data:[-0.021141875266089592, -0.3733872931278025, 0.0, 0.0]
+   data:[-0.453517035,  1.53813696,  0.00322026698,  0.00103383271,  -6.43034518]
+LEFT.K: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [1855.14056, 0.0, 576.490465, 0.0, 1855.17506, 461.186707, 0.0, 0.0, 1.0]
+LEFT.R:  !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+LEFT.P:  !!opencv-matrix
+   rows: 3
+   cols: 4
+   dt: d
+   data: [1855.14056, 0.0, 576.490465, 0.0, 0.0, 1855.17506, 461.186707, 0.0, 0.0, 0.0, 1.0, 0.0]
+
+#--------------------------------------------------------------------------------------------
+# IMU Parameters
+#--------------------------------------------------------------------------------------------
+
+# Transformation from camera to body-frame (imu)
+Tbc: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: f
+   data: [1.0, 0.0, 0.0, 0.15,
+          0.0, 1.0, 0.0, 0.66,
+          0.0, 0.0, 1.0, 0.0,
+          0.0, 0.0, 0.0, 1.0]
+
+
+IMU.Frequency: 100
+# IMU.NoiseAcc: 1.4e-3          # accelerometer measurement noise standard deviation. #0.2   0.04
+# IMU.NoiseGyro: 8.6e-5        # gyroscope measurement noise standard deviation.     #0.05  0.004
+# IMU.AccWalk: 8.0e-5         # accelerometer bias random work noise standard deviation.  #0.02
+# IMU.GyroWalk: 2.2e-6       # gyroscope bias random work noise standard deviation.     #4.0e-5
+IMU.NoiseAcc: 0.0137          # accelerometer measurement noise standard deviation. #0.2   0.04
+IMU.NoiseGyro: 0.6e-4        # gyroscope measurement noise standard deviation.     #0.05  0.004
+IMU.AccWalk: 0.00039         # accelerometer bias random work noise standard deviation.  #0.02
+IMU.GyroWalk: 0.48e-4       # gyroscope bias random work noise standard deviation.     #4.0e-5
+# g_norm: 9.81007     # gravity magnitude
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+
+# ORB Extractor: Number of features per image
+ORBextractor.nFeatures: 4000
+
+# ORB Extractor: Scale factor between levels in the scale pyramid 	
+ORBextractor.scaleFactor: 1.2
+
+# ORB Extractor: Number of levels in the scale pyramid	
+ORBextractor.nLevels: 4
+
+# ORB Extractor: Fast threshold
+# Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
+# Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
+# You can lower these values if your images have low contrast			
+ORBextractor.iniThFAST: 20
+ORBextractor.minThFAST: 7
+# ORBextractor.iniThFAST: 4
+# ORBextractor.minThFAST: 2
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize:2
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3
+Viewer.ViewpointX: 0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -1.8
+Viewer.ViewpointF: 500
+

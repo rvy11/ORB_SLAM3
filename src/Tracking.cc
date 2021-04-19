@@ -3750,6 +3750,8 @@ void Tracking::CreateNewMapPoints()
 
             cosParallaxStereo = min(cosParallaxStereo1,cosParallaxStereo2);
 
+            std::cout << "cosParallaxStereo = " << cosParallaxStereo << "\n";
+
             cv::Mat x3D;
             if(cosParallaxRays<cosParallaxStereo && cosParallaxRays>0 && (bStereo1 || bStereo2 || cosParallaxRays<0.9998))
             {
@@ -3781,8 +3783,10 @@ void Tracking::CreateNewMapPoints()
                 x3D = pKF2->UnprojectStereo(idx2);
             }
             else
+            {
+	            std::cout << "No stereo and very low parallax\n";
                 continue; //No stereo and very low parallax
-
+            }
             cv::Mat x3Dt = x3D.t();
 
             //Check triangulation in front of cameras

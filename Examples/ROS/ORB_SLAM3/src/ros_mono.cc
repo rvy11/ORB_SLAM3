@@ -46,12 +46,12 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "Mono");
     ros::start();
 
-    if(argc != 3)
+    if(argc != 4)
     {
-        cerr << endl << "Usage: rosrun ORB_SLAM3 Mono path_to_vocabulary path_to_settings" << endl;        
+        cerr << endl << "Usage: rosrun ORB_SLAM3 Mono path_to_vocabulary path_to_settings output_name" << endl;        
         ros::shutdown();
         return 1;
-    }    
+    }
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::MONOCULAR,true);
@@ -59,7 +59,10 @@ int main(int argc, char **argv)
     ImageGrabber igb(&SLAM);
 
     ros::NodeHandle nodeHandler;
-    ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage,&igb);
+    // ros::Subscriber sub = nodeHandler.subscribe("/snappy_cam/stereo_l", 1, &ImageGrabber::GrabImage,&igb);
+    // ros::Subscriber sub = nodeHandler.subscribe("/dvs/image_raw", 1, &ImageGrabber::GrabImage,&igb);
+    ros::Subscriber sub = nodeHandler.subscribe("/camera_array/cam1/image_raw", 1, &ImageGrabber::GrabImage,&igb);
+    // ros::Subscriber sub = nodeHandler.subscribe("/zedm/zed_node/left/image_rect_color", 1, &ImageGrabber::GrabImage,&igb);
 
     ros::spin();
 
@@ -67,7 +70,11 @@ int main(int argc, char **argv)
     SLAM.Shutdown();
 
     // Save camera trajectory
-    SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+    // SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+    const string kf_file =  "kf_" + string(argv[argc-1]) + ".txt";
+    const string f_file =  "f_" + string(argv[argc-1]) + ".txt";
+    SLAM.SaveTrajectoryTUM(f_file);
+    SLAM.SaveKeyFrameTrajectoryTUM(kf_file);
 
     ros::shutdown();
 

@@ -731,6 +731,7 @@ void Frame::ComputeBoW()
 
 void Frame::UndistortKeyPoints()
 {
+    cout << "undistorting frame with params = " << mDistCoef << "\n";
     if(mDistCoef.at<float>(0)==0.0)
     {
         mvKeysUn=mvKeys;
