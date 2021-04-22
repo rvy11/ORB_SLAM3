@@ -1,0 +1,252 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters. Adjust them!
+#--------------------------------------------------------------------------------------------
+Camera.type: "PinHole"
+
+# Camera calibration and distortion parameters (OpenCV) 
+Camera.fx: 1855.14056
+Camera.fy: 1855.17506
+Camera.cx: 576.490465
+Camera.cy: 461.186707
+
+# Camera.k1: -0.453517035
+# Camera.k2: 1.53813696
+# Camera.p1: 0.00322026698
+# Camera.p2: 0.00103383271
+# Camera.k3: -6.43034518
+
+Camera.k1: 0.0
+Camera.k2: 0.0
+Camera.p1: 0.0
+Camera.p2: 0.0
+
+# Camera2.fx: 1848.07476
+# Camera2.fy: 1848.62591
+# Camera2.cx: 590.529970
+# Camera2.cy: 479.328489
+
+# Camera2.k1: -0.326122341
+# Camera2.k2: -0.597094776
+# Camera2.p1: 0.00251398230
+# Camera2.p2: -0.000829770945
+# Camera2.k3: 4.73314324
+
+Camera.bFishEye: 0
+
+Tlr: !!opencv-matrix
+  rows: 3
+  cols: 4
+  dt: f
+  data: [ 1.0, 0.0, 0.0, 0.33,
+          0.0, 1.0, 0.0, 0.00,
+          0.0, 0.0, 1.0, 0.00]
+
+Camera.width: 1224
+Camera.height: 1024
+
+# Lapping areas between images
+Camera.lappingBegin: 0
+Camera.lappingEnd: 1223
+
+Camera2.lappingBegin: 0
+Camera2.lappingEnd: 1223
+
+# Camera frames per second 
+# Camera.fps: 5
+Camera.fps: 8.66
+
+# stereo baseline times fx
+# Camera.bf: 612.1963848
+Camera.bf: 612.196365
+
+# Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
+Camera.RGB: 1
+
+# Close/Far threshold. Baseline times.
+ThDepth: 40.0
+
+#--------------------------------------------------------------------------------------------
+# Stereo Rectification. Only if you need to pre-rectify the images.
+# Camera.fx, .fy, etc must be the same as in LEFT.P
+#--------------------------------------------------------------------------------------------
+
+# Cam1:
+#  [[1.85514056e+03 0.00000000e+00 5.76490465e+02]
+#   [0.00000000e+00 1.85517506e+03 4.61186707e+02]
+#   [0.00000000e+00 0.00000000e+00 1.00000000e+00]] 
+#  [[-4.53517035e-01  1.53813696e+00  3.22026698e-03  1.03383271e-03  -6.43034518e+00]]
+
+LEFT.height: 1024
+LEFT.width: 1224
+LEFT.D: !!opencv-matrix
+   rows: 1
+   cols: 5
+   dt: d
+   data: [-4.53517035e-1, 1.53813696, 3.22026698e-3, 1.03383271e-3, -6.43034518]
+LEFT.K: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [1855.14056, 0.0, 576.490465, 0.0, 1855.17506, 461.186707, 0.0, 0.0, 1.0]
+LEFT.R:  !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+LEFT.P:  !!opencv-matrix
+   rows: 3
+   cols: 4
+   dt: d
+   data: [1855.14056, 0.0, 576.490465, 0.0, 0.0, 1855.17506, 461.186707, 0.0, 0.0, 0.0, 1.0, 0.0]
+
+# Cam2: 
+#  [[1.84807476e+03 0.00000000e+00 5.90529970e+02]
+#   [0.00000000e+00 1.84862591e+03 4.79328489e+02]
+#   [0.00000000e+00 0.00000000e+00 1.00000000e+00]] 
+#  [[-3.26122341e-01 -5.97094776e-01  2.51398230e-03 -8.29770945e-04   4.73314324e+00]]
+
+RIGHT.height: 1024
+RIGHT.width: 1224
+RIGHT.D: !!opencv-matrix
+   rows: 1
+   cols: 5
+   dt: d
+   data: [-3.26122341e-1, -5.97094776e-1, 2.51398230e-3, -8.29770945e-4, 4.73314324]
+RIGHT.K: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [1848.07476, 0.0, 590.529970, 0.0, 1848.62591, 479.328489, 0.0, 0.0, 1.0]
+RIGHT.R:  !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+RIGHT.P:  !!opencv-matrix
+   rows: 3
+   cols: 4
+   dt: d
+   data: [1848.07476, 0.0, 590.529970, 0.0, 0.0, 1848.62591, 479.328489, 0.0, 0.0, 0.0, 1.0, 0.0]
+
+#--------------------------------------------------------------------------------------------
+# IMU Parameters
+#--------------------------------------------------------------------------------------------
+
+# Transformation from camera to body-frame (imu)
+Tbc: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: f
+   data: [0.0, 1.0, 0.0, 0.33,
+          0.0, 0.0, 1.0, 0.0,
+          1.0, 0.0, 0.0, -0.15,
+          0.0, 0.0, 0.0, 1.0]
+
+# Tbc: !!opencv-matrix
+#    rows: 4
+#    cols: 4
+#    dt: f
+#    data: [0.0, 0.0, 1.0, 0.15,
+#           1.0, 0.0, 0.0, -0.33,
+#           0.0, 1.0, 0.0, 0.0,
+#           0.0, 0.0, 0.0, 1.0]
+
+IMU.Frequency: 100
+      # gyr_n: 6.6874234384522232e-04
+      # gyr_w: 1.9222795985920433e-05
+      # acc_n: 1.5625391734576680e-02
+      # acc_w: 2.3347315743898570e-04
+IMU.NoiseAcc: 1.5625391734576680e-2          # accelerometer measurement noise standard deviation. #0.2   0.04
+IMU.AccWalk: 2.3347315743898570e-4         # accelerometer bias random work noise standard deviation.  #0.02
+IMU.NoiseGyro: 6.6874234384522232e-4        # gyroscope measurement noise standard deviation.     #0.05  0.004
+IMU.GyroWalk: 1.9222795985920433e-5       # gyroscope bias random work noise standard deviation.     #4.0e-5
+# g_norm: 9.81007     # gravity magnitude
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+
+# ORB Extractor: Number of features per image
+ORBextractor.nFeatures: 10000
+
+# ORB Extractor: Scale factor between levels in the scale pyramid 	
+ORBextractor.scaleFactor: 1.2
+
+# ORB Extractor: Number of levels in the scale pyramid	
+ORBextractor.nLevels: 8
+
+# ORB Extractor: Fast threshold
+# Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
+# Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
+# You can lower these values if your images have low contrast			
+ORBextractor.iniThFAST: 7
+ORBextractor.minThFAST: 3
+# ORBextractor.iniThFAST: 4
+# ORBextractor.minThFAST: 2
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3
+Viewer.ViewpointX: 0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -1.8
+Viewer.ViewpointF: 500
+
+#--------------------------------------------------------------------------------------------
+# Camera Info
+#--------------------------------------------------------------------------------------------
+# ---
+# header: 
+#   seq: 25906
+#   stamp: 
+#     secs: 1617214338
+#     nsecs: 466551823
+#   frame_id: "cam_1_optical_frame"
+# height: 1536
+# width: 2048
+# distortion_model: "plumb_bob"
+# D: [-0.06001035588294054, 0.3466585291091072, -1.0932356940133992, 3.4511959617065253]
+# K: [1872.1392958276606, 0.0, 583.2925844388025, 0.0, 1872.6168324818198, 483.72597760530056, 0.0, 0.0, 1.0]
+# R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+# P: [703.910323, 0.0, 815.113302, 0.0, 0.0, 958.319231, 636.871993, 0.0, 0.0, 0.0, 1.0, 0.0]
+# binning_x: 2
+# binning_y: 2
+# roi: 
+#   x_offset: 0
+#   y_offset: 0
+#   height: 0
+#   width: 0
+#   do_rectify: False
+# ---
+
+# ---
+# header: 
+#   seq: 26165
+#   stamp: 
+#     secs: 1617214368
+#     nsecs: 785832160
+#   frame_id: "cam_2_optical_frame"
+# height: 1536
+# width: 2048
+# distortion_model: "plumb_bob"
+# D: [0.011193049778465896, -0.8232116346873426, 6.503615507139952, -14.83036814949066]
+# K: [1872.6246599679714, 0.0, 594.706935782809, 0.0, 1873.4112078551445, 497.511707550892, 0.0, 0.0, 1.0]
+# R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+# P: [913.700317, 0.0, 953.448302, 0.0, 0.0, 911.742312, 811.121993, 0.0, 0.0, 0.0, 1.0, 0.0]
+# binning_x: 2
+# binning_y: 2
+# roi: 
+#   x_offset: 0
+#   y_offset: 0
+#   height: 0
+#   width: 0
+#   do_rectify: False
+# ---

@@ -24,6 +24,10 @@
 
 #include<ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Pose.h>
+#include <nav_msgs/Odometry.h>
+#include <nav_msgs/Path.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
@@ -31,8 +35,19 @@
 #include<opencv2/core/core.hpp>
 
 #include"../../../include/System.h"
+#include "../../../include/Converter.h"
 
 using namespace std;
+
+static ros::Publisher voPub;
+static ros::Publisher odomPub;
+
+/* Global path vector */
+nav_msgs::Path voPath;
+nav_msgs::Odometry lastOdom;
+geometry_msgs::Pose lastPose;
+
+bool publishOnce = false;
 
 class ImageGrabber
 {
@@ -51,15 +66,20 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "RGBD");
     ros::start();
 
+    bool showViewer = false;
+
     if(argc != 5)
     {
         cerr << endl << "Usage: rosrun ORB_SLAM3 Stereo path_to_vocabulary path_to_settings do_rectify output_name" << endl;
         ros::shutdown();
         return 1;
-    }    
+    }
+
+    // Check rosparam to find out if showing viewer is desired
+    ros::param::param<bool>("vo_node/showViewer", showViewer);
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::STEREO,true);
+    ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::STEREO,showViewer);
 
     ImageGrabber igb(&SLAM);
 
@@ -107,6 +127,10 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
+    voPub = nh.advertise<nav_msgs::Path>("/vo/path", 1000);
+
+    odomPub = nh.advertise<nav_msgs::Odometry>("/odometry/vo", 1000);
+
     // message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/zedm/zed_node/left/image_rect_color", 1);
     message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/camera_array/cam1/image_raw", 1);
     // message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/zedm/zed_node/right/image_rect_color", 1);
@@ -134,6 +158,7 @@ int main(int argc, char **argv)
 void ImageGrabber::GrabStereo(const sensor_msgs::ImageConstPtr& msgLeft,const sensor_msgs::ImageConstPtr& msgRight)
 {
     // Copy the ros image message to cv::Mat.
+    cv::Mat mTcw;
     cv_bridge::CvImageConstPtr cv_ptrLeft;
     try
     {
@@ -161,13 +186,60 @@ void ImageGrabber::GrabStereo(const sensor_msgs::ImageConstPtr& msgLeft,const se
         cv::Mat imLeft, imRight;
         cv::remap(cv_ptrLeft->image,imLeft,M1l,M2l,cv::INTER_LINEAR);
         cv::remap(cv_ptrRight->image,imRight,M1r,M2r,cv::INTER_LINEAR);
-        mpSLAM->TrackStereo(imLeft,imRight,cv_ptrLeft->header.stamp.toSec());
+        mTcw = mpSLAM->TrackStereo(imLeft,imRight,cv_ptrLeft->header.stamp.toSec());
     }
     else
     {
-        mpSLAM->TrackStereo(cv_ptrLeft->image,cv_ptrRight->image,cv_ptrLeft->header.stamp.toSec());
+        mTcw = mpSLAM->TrackStereo(cv_ptrLeft->image,cv_ptrRight->image,cv_ptrLeft->header.stamp.toSec());
     }
 
+    if (!mTcw.empty())
+    {
+        cv::Mat Rwc = mTcw.rowRange(0,3).colRange(0,3).t();
+        cv::Mat twc = -Rwc*mTcw.rowRange(0,3).col(3);
+        vector<float> q = ORB_SLAM3::Converter::toQuaternion(Rwc);
+        float x = twc.at<float>(0);
+        float y = twc.at<float>(1);
+        float z = twc.at<float>(2);
+        float qx = q[0];
+        float qy = q[1];
+        float qz = q[2];
+        float qw = q[3];
+
+        nav_msgs::Odometry odom;
+        geometry_msgs::PoseStamped poseStamped;
+        geometry_msgs::Pose pose;
+
+        odom.header = msgLeft->header;
+        poseStamped.header = msgLeft->header;
+
+        pose.position.x = x;
+        pose.position.y = y;
+        pose.position.z = z;
+
+        pose.orientation.x = qx;
+        pose.orientation.y = qy;
+        pose.orientation.z = qz;
+        pose.orientation.w = qw;
+
+        poseStamped.pose = pose;
+        odom.pose.pose = pose;
+
+        voPath.header = msgLeft->header;
+        voPath.poses.push_back(poseStamped);
+        voPub.publish(voPath);
+        odomPub.publish(odom);
+        lastOdom = odom;
+        publishOnce = true;
+    } 
+    else 
+    {
+        if (publishOnce) {
+            // Tracking lost, so continue to publish previous message
+            voPub.publish(voPath);
+            odomPub.publish(lastOdom);
+        }
+    }
 }
 
 
