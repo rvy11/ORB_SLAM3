@@ -37,14 +37,6 @@
 
 using namespace std;
 
-static ros::Publisher voPub;
-static ros::Publisher odomPub;
-
-/* Global path vector */
-nav_msgs::Path voPath;
-nav_msgs::Odometry lastOdom;
-geometry_msgs::Pose lastPose;
-
 /* Projection matrix */
 cv::Mat H = cv::Mat::eye(4, 4, CV_32F);
 
@@ -70,11 +62,6 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    // Initialize last pose to (0,0,0)
-    lastPose.position.x = 0.0;
-    lastPose.position.y = 0.0;
-    lastPose.position.z = 0.0;
-
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::MONOCULAR,true);
 
@@ -83,10 +70,6 @@ int main(int argc, char **argv)
     ros::NodeHandle nodeHandler;
 
     ros::Subscriber sub = nodeHandler.subscribe("/camera_array/cam2/image_raw", 1, &ImageGrabber::GrabImage,&igb);
-
-    voPub = nodeHandler.advertise<nav_msgs::Path>("/vo/path", 1000);
-
-    odomPub = nodeHandler.advertise<nav_msgs::Odometry>("/odometry/vo", 1000);
 
     ros::spin();
 
@@ -97,8 +80,8 @@ int main(int argc, char **argv)
     // SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
     const string kf_file =  "kf_" + string(argv[argc-1]) + ".txt";
     const string f_file =  "f_" + string(argv[argc-1]) + ".txt";
-    SLAM.SaveTrajectoryTUM(f_file);
-    SLAM.SaveKeyFrameTrajectoryTUM(kf_file);
+    SLAM.SaveTrajectoryEuRoC(f_file);
+    SLAM.SaveKeyFrameTrajectoryEuRoC(kf_file);
 
     ros::shutdown();
 
@@ -121,48 +104,4 @@ void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
     }
 
     cv::Mat mTcw = mpSLAM->TrackMonocular(cv_ptr->image,cv_ptr->header.stamp.toSec());
-
-    cout << "camPose = " << mTcw << endl;
-
-    if (!mTcw.empty())
-    {
-
-        cv::Mat mRcw = mTcw.rowRange(0,3).colRange(0,3);
-
-        cv::Mat mtcw = mTcw.rowRange(0,3).col(3);
-
-        nav_msgs::Odometry odom;
-        geometry_msgs::PoseStamped poseStamped;
-        geometry_msgs::Pose pose;
-        
-        odom.header = msg->header;
-        poseStamped.header = msg->header;
-
-        lastPose.position.x = mtcw.at<float>(0, 0);
-        lastPose.position.y = mtcw.at<float>(1, 0);
-        lastPose.position.z = mtcw.at<float>(2, 0);
-        pose.position = lastPose.position;
-
-        vector<float> q = ORB_SLAM3::Converter::toQuaternion(mRcw);
-
-        pose.orientation.x = q[0];
-        pose.orientation.y = q[1];
-        pose.orientation.z = q[2];
-        pose.orientation.w = q[3];
-
-        // cout << "R = " << camPose.rowRange(0,3).colRange(0,3) << ", T = " << trans << endl;
-
-        poseStamped.pose = pose;
-
-        odom.pose.pose = pose;
-
-        voPath.poses.push_back(poseStamped);
-        voPub.publish(voPath);
-        odomPub.publish(odom);
-        lastOdom = odom;
-    } else {
-        // Tracking lost, so continue to publish previous message
-        voPub.publish(voPath);
-        odomPub.publish(lastOdom);
-    }
 }
