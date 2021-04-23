@@ -31,6 +31,7 @@
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
+#include <tf/transform_broadcaster.h>
 
 #include<opencv2/core/core.hpp>
 
@@ -39,13 +40,10 @@
 
 using namespace std;
 
-static ros::Publisher voPub;
 static ros::Publisher odomPub;
 
 /* Global path vector */
-nav_msgs::Path voPath;
 nav_msgs::Odometry lastOdom;
-geometry_msgs::Pose lastPose;
 
 bool publishOnce = false;
 
@@ -127,8 +125,6 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    voPub = nh.advertise<nav_msgs::Path>("/vo/path", 1000);
-
     odomPub = nh.advertise<nav_msgs::Odometry>("/odometry/vo", 1000);
 
     // message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/zedm/zed_node/left/image_rect_color", 1);
@@ -157,6 +153,7 @@ int main(int argc, char **argv)
 
 void ImageGrabber::GrabStereo(const sensor_msgs::ImageConstPtr& msgLeft,const sensor_msgs::ImageConstPtr& msgRight)
 {
+    // static tf::TransformBroadcaster odom_broadcaster;
     // Copy the ros image message to cv::Mat.
     cv::Mat mTcw;
     cv_bridge::CvImageConstPtr cv_ptrLeft;
@@ -207,11 +204,24 @@ void ImageGrabber::GrabStereo(const sensor_msgs::ImageConstPtr& msgLeft,const se
         float qw = q[3];
 
         nav_msgs::Odometry odom;
-        geometry_msgs::PoseStamped poseStamped;
         geometry_msgs::Pose pose;
+        // geometry_msgs::Quaternion odom_quat;
 
-        odom.header = msgLeft->header;
-        poseStamped.header = msgLeft->header;
+        // odom_quat.x = qx;
+        // odom_quat.y = qy;
+        // odom_quat.z = qz;
+        // odom_quat.w = qw;
+
+        // geometry_msgs::TransformStamped odom_trans;
+        // odom_trans.header.stamp = msgLeft->header.stamp;
+        // odom_trans.header.frame_id = "odom";
+        // odom_trans.child_frame_id = "base_footprint";
+
+        // odom_trans.transform.translation.x = x;
+        // odom_trans.transform.translation.y = y;
+        // odom_trans.transform.translation.z = z;
+        // odom_trans.transform.rotation = odom_quat;
+        // odom_broadcaster.sendTransform(odom_trans);
 
         pose.position.x = x;
         pose.position.y = y;
@@ -222,23 +232,21 @@ void ImageGrabber::GrabStereo(const sensor_msgs::ImageConstPtr& msgLeft,const se
         pose.orientation.z = qz;
         pose.orientation.w = qw;
 
-        poseStamped.pose = pose;
+        odom.header = msgLeft->header;
+        // odom.header.stamp = msgLeft->header.stamp;
+        // odom.header.frame_id = "odom";
+        // odom.child_frame_id = "base_footprint";
         odom.pose.pose = pose;
-
-        voPath.header = msgLeft->header;
-        voPath.poses.push_back(poseStamped);
-        voPub.publish(voPath);
         odomPub.publish(odom);
         lastOdom = odom;
         publishOnce = true;
     } 
     else 
     {
-        if (publishOnce) {
-            // Tracking lost, so continue to publish previous message
-            voPub.publish(voPath);
-            odomPub.publish(lastOdom);
-        }
+        // if (publishOnce) {
+        //     // Tracking lost, so continue to publish previous message
+        //     odomPub.publish(lastOdom);
+        // }
     }
 }
 
