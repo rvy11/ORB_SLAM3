@@ -153,7 +153,6 @@ int main(int argc, char **argv)
 
 void ImageGrabber::GrabStereo(const sensor_msgs::ImageConstPtr& msgLeft,const sensor_msgs::ImageConstPtr& msgRight)
 {
-    // static tf::TransformBroadcaster odom_broadcaster;
     // Copy the ros image message to cv::Mat.
     cv::Mat mTcw;
     cv_bridge::CvImageConstPtr cv_ptrLeft;
@@ -205,23 +204,6 @@ void ImageGrabber::GrabStereo(const sensor_msgs::ImageConstPtr& msgLeft,const se
 
         nav_msgs::Odometry odom;
         geometry_msgs::Pose pose;
-        // geometry_msgs::Quaternion odom_quat;
-
-        // odom_quat.x = qx;
-        // odom_quat.y = qy;
-        // odom_quat.z = qz;
-        // odom_quat.w = qw;
-
-        // geometry_msgs::TransformStamped odom_trans;
-        // odom_trans.header.stamp = msgLeft->header.stamp;
-        // odom_trans.header.frame_id = "odom";
-        // odom_trans.child_frame_id = "base_footprint";
-
-        // odom_trans.transform.translation.x = x;
-        // odom_trans.transform.translation.y = y;
-        // odom_trans.transform.translation.z = z;
-        // odom_trans.transform.rotation = odom_quat;
-        // odom_broadcaster.sendTransform(odom_trans);
 
         pose.position.x = x;
         pose.position.y = y;
@@ -233,21 +215,18 @@ void ImageGrabber::GrabStereo(const sensor_msgs::ImageConstPtr& msgLeft,const se
         pose.orientation.w = qw;
 
         odom.header = msgLeft->header;
-        // odom.header.stamp = msgLeft->header.stamp;
-        // odom.header.frame_id = "odom";
-        // odom.child_frame_id = "base_footprint";
         odom.pose.pose = pose;
         odomPub.publish(odom);
         lastOdom = odom;
         publishOnce = true;
     } 
-    else 
-    {
-        // if (publishOnce) {
-        //     // Tracking lost, so continue to publish previous message
-        //     odomPub.publish(lastOdom);
-        // }
-    }
+    // else 
+    // {
+    //     if (publishOnce) {
+    //         // Tracking lost, so continue to publish previous message
+    //         odomPub.publish(lastOdom);
+    //     }
+    // }
 }
 
 
